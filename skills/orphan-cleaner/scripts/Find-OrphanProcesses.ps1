@@ -116,7 +116,7 @@ $orphans = foreach ($p in $all) {
         TreeMB   = [int](($tree | Measure-Object WorkingSetSize -Sum).Sum / 1MB)
         Children = $tree.Count - 1
         Ports    = $ports
-        Command  = if ($p.CommandLine) { $p.CommandLine.Substring(0, [Math]::Min(120, $p.CommandLine.Length)) } else { '' }
+        Command  = if ($p.CommandLine) { $p.CommandLine.Trim() } else { '' }   # full command line, never truncated
         _Tree    = $tree
     }
 }

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- Orphan Cleaner: a process tree whose cut-off branch ends in an orphan marked for removal. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5B5BF0"/>
+      <stop offset="1" stop-color="#1E1B4B"/>
+    </linearGradient>
+    <linearGradient id="orphan" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FDBA4D"/>
+      <stop offset="1" stop-color="#F97316"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#FB923C" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#FB923C" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#bg)"/>
+  <rect x="8.5" y="8.5" width="239" height="239" rx="55.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.14"/>
+
+  <!-- live branch: root -> child -->
+  <path d="M78 78 V178" stroke="#E0E7FF" stroke-width="14" stroke-linecap="round" fill="none"/>
+  <!-- cut branch: root -> orphan, broken in the middle -->
+  <path d="M78 78 L113 113" stroke="#E0E7FF" stroke-width="14" stroke-linecap="round" fill="none"/>
+  <path d="M143 143 L160 160" stroke="#E0E7FF" stroke-opacity="0.45" stroke-width="14" stroke-linecap="round" stroke-dasharray="1 22" fill="none"/>
+  <!-- cut mark -->
+  <path d="M104 136 L136 104" stroke="#FDBA4D" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- nodes -->
+  <circle cx="78" cy="78" r="26" fill="#FFFFFF"/>
+  <circle cx="78" cy="78" r="10" fill="#4F46E5"/>
+  <circle cx="78" cy="182" r="20" fill="#C7D2FE"/>
+
+  <!-- orphan, marked for removal -->
+  <circle cx="178" cy="178" r="56" fill="url(#glow)"/>
+  <circle cx="178" cy="178" r="34" fill="url(#orphan)"/>
+  <circle cx="178" cy="178" r="34" fill="none" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="3"/>
+  <path d="M164 164 L192 192 M192 164 L164 192" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round"/>
+</svg>

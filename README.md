@@ -1,6 +1,17 @@
-# Orphan Process Cleaner
+<p align="center">
+  <img src="assets/icon.png" width="128" height="128" alt="Orphan Cleaner icon">
+</p>
 
-**Find and kill the processes your coding agents leave behind, on Windows, macOS and Linux.**
+<h1 align="center">Orphan Process Cleaner</h1>
+
+<p align="center"><b>Find and kill the processes your coding agents leave behind, on Windows, macOS and Linux.</b></p>
+
+<p align="center">
+  <a href="https://github.com/jp7chaiban/orphan-cleaner/releases/latest/download/OrphanCleaner.exe"><b>Download for Windows</b></a> ·
+  <a href="https://github.com/jp7chaiban/orphan-cleaner/releases/latest/download/orphan-cleaner.sh"><b>macOS / Linux script</b></a> ·
+  <a href="https://github.com/jp7chaiban/orphan-cleaner/releases/latest/download/orphan-cleaner-skill.zip"><b>Agent skill</b></a> ·
+  <a href="https://github.com/jp7chaiban/orphan-cleaner/releases">All releases</a>
+</p>
 
 Coding agents (Claude Code, Codex CLI, Cursor, Aider, Copilot agent mode…) run a lot of shell
 commands in the background: `tail -f build.log | grep --line-buffered "FAIL|passed"`, test
@@ -48,7 +59,28 @@ Killing an orphan kills its whole process tree, children first. Right before it 
 checks again that the PID still belongs to the same process, so a PID that was reused in the meantime is
 never hit. The shell running the tool is never touched.
 
-## Install
+## Quick download
+
+Every [release](https://github.com/jp7chaiban/orphan-cleaner/releases/latest) has ready-to-use files,
+built automatically from the tagged source:
+
+| | Download | Use it |
+|---|---|---|
+| **Windows** | [OrphanCleaner.exe](https://github.com/jp7chaiban/orphan-cleaner/releases/latest/download/OrphanCleaner.exe) | Double-click. A single self-contained file with nothing to install. |
+| **macOS / Linux** | [orphan-cleaner.sh](https://github.com/jp7chaiban/orphan-cleaner/releases/latest/download/orphan-cleaner.sh) | `bash orphan-cleaner.sh` to report, `bash orphan-cleaner.sh -i` to pick what to kill. |
+| **Agent skill** | [orphan-cleaner-skill.zip](https://github.com/jp7chaiban/orphan-cleaner/releases/latest/download/orphan-cleaner-skill.zip) | Unzip into `~/.claude/skills/` or your agent's skills folder. |
+
+From a terminal:
+
+```bash
+curl -fsSLO https://github.com/jp7chaiban/orphan-cleaner/releases/latest/download/orphan-cleaner.sh
+bash orphan-cleaner.sh
+```
+
+> The exe is not code-signed, so the first time you run it, Windows SmartScreen may say *"Windows protected
+> your PC"*. Click **More info → Run anyway**, or build it yourself from source as described below.
+
+## Install from source
 
 ```bash
 git clone https://github.com/jp7chaiban/orphan-cleaner.git
@@ -87,7 +119,8 @@ To update on any OS, `git pull` and run the installer again.
 
 ### Windows: the window
 
-Double-click **Orphan Cleaner** on your Desktop. It scans straight away.
+Double-click **Orphan Cleaner** on your Desktop. It scans straight away. Select a row to see that
+process's full command line in the box at the bottom, where you can also copy it.
 
 | Row colour | Meaning | Ticked by default? |
 |---|---|---|
@@ -215,5 +248,11 @@ src/windows/OrphanCleaner-GUI.ps1                      Windows window (WinForms)
 src/windows/launcher/OrphanCleaner.cs                  self-contained exe that carries the scripts
 scripts/install.ps1                                    Windows installer (exe, -Skill)
 scripts/install.sh                                     macOS / Linux installer (command, --skill)
+scripts/build-icon.ps1                                 draws the icon, README logo and social preview
+assets/                                                icon (SVG source, .ico, .png) and social preview
 .claude-plugin/                                        Claude Code plugin + marketplace manifests
+.github/workflows/release.yml                          builds the downloads and publishes a release for each v* tag
 ```
+
+To make a release: bump `version` in `.claude-plugin/plugin.json`, commit, then
+`git tag v1.2.0 && git push origin v1.2.0`. GitHub Actions does the rest.

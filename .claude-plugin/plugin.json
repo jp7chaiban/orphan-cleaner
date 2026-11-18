@@ -1,6 +1,6 @@
 {
   "name": "orphan-cleaner",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Find and kill orphaned processes left behind by coding agents (forgotten tail/grep watchers, test runners, dev servers) on Windows, macOS and Linux.",
   "author": { "name": "jp7chaiban" },
   "homepage": "https://github.com/jp7chaiban/orphan-cleaner",

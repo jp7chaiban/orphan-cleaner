@@ -18,7 +18,10 @@ $form.Size = New-Object Drawing.Size(1100, 600)
 $form.MinimumSize = New-Object Drawing.Size(760, 420)
 $form.StartPosition = 'CenterScreen'
 $form.Font = New-Object Drawing.Font('Segoe UI', 9.5)
-try { $form.Icon = [Drawing.Icon]::ExtractAssociatedIcon("$env:WINDIR\System32\Taskmgr.exe") } catch { }
+# Icon: next to this file when unpacked by the exe; in assets\ when run from the repo.
+foreach ($ico in (Join-Path $PSScriptRoot 'OrphanCleaner.ico'), (Join-Path $PSScriptRoot '..\..\assets\icon.ico')) {
+    if (Test-Path $ico) { try { $form.Icon = New-Object Drawing.Icon $ico; break } catch { } }
+}
 
 # ---------- top bar ----------
 $top = New-Object Windows.Forms.FlowLayoutPanel
@@ -67,8 +70,29 @@ foreach ($h in 'Name','PID','Type','Age','CPU (s)','RAM (MB)','Children','Ports'
     [void]$grid.Columns.Add($c)
 }
 $grid.Columns[9].AutoSizeMode = 'Fill'
+$grid.ShowCellToolTips = $true
 # Commit checkbox clicks immediately so "Kill selected" sees them.
 $grid.Add_CurrentCellDirtyStateChanged({ if ($grid.IsCurrentCellDirty) { $grid.CommitEdit('CurrentCellChange') } })
+
+# ---------- details: full command line of the selected row ----------
+$details = New-Object Windows.Forms.GroupBox
+$details.Text = 'Full command line of the selected process'
+$details.Dock = 'Bottom'; $details.Height = 110; $details.Padding = '8,4,8,8'
+$detailsText = New-Object Windows.Forms.TextBox
+$detailsText.Dock = 'Fill'; $detailsText.Multiline = $true; $detailsText.ReadOnly = $true
+$detailsText.ScrollBars = 'Vertical'; $detailsText.WordWrap = $true
+$detailsText.Font = New-Object Drawing.Font('Consolas', 9.5)
+$detailsText.BackColor = [Drawing.SystemColors]::Window
+$detailsText.Text = 'Select a row to see its full command line here. You can select and copy it.'
+$details.Controls.Add($detailsText)
+function Show-Details {
+    $row = $grid.CurrentRow
+    if ($row -and $row.Tag) {
+        $o = $row.Tag
+        $detailsText.Text = "PID $($o.Id) ($($o.Name)), started $($o.Started)`r`n$($o.Command)"
+    }
+}
+$grid.Add_SelectionChanged({ Show-Details })
 
 # ---------- bottom bar ----------
 $bottom = New-Object Windows.Forms.Panel
@@ -89,7 +113,8 @@ $buttons.Controls.AddRange(@($btnAll, $btnNone, $btnKill))
 
 $bottom.Controls.Add($status); $bottom.Controls.Add($buttons)
 
-$form.Controls.Add($grid); $form.Controls.Add($top); $form.Controls.Add($bottom)
+# Docking runs from the last-added control back: bottom bar, top bar, details box, then the grid fills the rest.
+$form.Controls.Add($grid); $form.Controls.Add($details); $form.Controls.Add($top); $form.Controls.Add($bottom)
 
 # ---------- logic ----------
 function Format-Age([double]$hours) {
@@ -108,6 +133,7 @@ function Invoke-Scan {
         [void][Windows.Forms.MessageBox]::Show("Scan failed:`n$($_.Exception.Message)", 'Orphan Process Cleaner', 'OK', 'Error')
     }
     $grid.Rows.Clear()
+    $detailsText.Text = 'Select a row to see its full command line here. You can select and copy it.'
     foreach ($o in $script:items) {
         $isServer = [bool]$o.Ports
         $type = if ($isServer) { 'Server (listening)' } elseif ($o.Tier -eq 'helper') { 'Leftover helper' } else { 'Runtime' }
@@ -126,6 +152,7 @@ function Invoke-Scan {
         $status.Text = "$($script:items.Count) orphaned process(es) using $mb MB. Leftover helpers are pre-ticked; blue = runtime, yellow = server still listening (check before killing)."
         $status.ForeColor = [Drawing.SystemColors]::ControlText
     }
+    Show-Details   # the first row is selected automatically while rows are added, before its data is attached
     $btnScan.Enabled = $true; $btnKill.Enabled = $script:items.Count -gt 0; $form.Cursor = 'Default'
 }
 

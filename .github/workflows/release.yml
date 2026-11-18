@@ -1,0 +1,52 @@
+# Builds the downloads and publishes a GitHub release whenever a version tag (v1.2.3) is pushed.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the Windows exe
+        shell: powershell
+        run: .\scripts\install.ps1 -ExeDir dist -ExeName OrphanCleaner.exe
+
+      - name: Package the macOS/Linux script and the agent skill
+        shell: pwsh
+        run: |
+          Copy-Item skills/orphan-cleaner/scripts/orphan-cleaner.sh dist/orphan-cleaner.sh
+          # bsdtar writes a standard zip with forward slashes, so it unpacks cleanly on macOS and Linux.
+          tar -a -c -f dist/orphan-cleaner-skill.zip -C skills orphan-cleaner
+          Get-ChildItem dist | Format-Table Name, Length
+
+      - name: Publish the release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag  = $env:GITHUB_REF_NAME
+          $repo = $env:GITHUB_REPOSITORY
+          $notes = @"
+          ## Downloads
+
+          | | File | How to use |
+          |---|---|---|
+          | **Windows** | [OrphanCleaner.exe](https://github.com/$repo/releases/download/$tag/OrphanCleaner.exe) | Double-click. A single self-contained file, nothing to install. |
+          | **macOS / Linux** | [orphan-cleaner.sh](https://github.com/$repo/releases/download/$tag/orphan-cleaner.sh) | ``bash orphan-cleaner.sh`` to report, ``-i`` to pick what to kill. |
+          | **Agent skill** | [orphan-cleaner-skill.zip](https://github.com/$repo/releases/download/$tag/orphan-cleaner-skill.zip) | Unzip into ``~/.claude/skills/`` (or your agent's skills folder). |
+
+          Claude Code users can also install the skill as a plugin:
+          ``/plugin marketplace add $repo`` then ``/plugin install orphan-cleaner@orphan-cleaner``.
+
+          > The exe is not code-signed, so Windows SmartScreen may say "Windows protected your PC" the first time.
+          > Click **More info → Run anyway**, or build it yourself from source with ``scripts\install.ps1``.
+          "@
+          gh release create $tag dist/OrphanCleaner.exe dist/orphan-cleaner.sh dist/orphan-cleaner-skill.zip `
+            --repo $repo --title "Orphan Cleaner $tag" --notes $notes --generate-notes

@@ -159,7 +159,7 @@ printf '%3s  %-7s %-9s %-8s %6s %5s  %-11s %s\n' '#' 'PID' 'NAME' 'TIER' 'AGE' '
 n=0
 while IFS="$SEP" read -r pid name tier age procs tree ports args; do
   n=$((n + 1))
-  printf '%3s  %-7s %-9s %-8s %6s %5s  %-11s %.90s\n' "$n" "$pid" "$name" "$tier" "$(fmt_age "$age")" "$procs" "${ports:--}" "$args"
+  printf '%3s  %-7s %-9s %-8s %6s %5s  %-11s %s\n' "$n" "$pid" "$name" "$tier" "$(fmt_age "$age")" "$procs" "${ports:--}" "$args"
 done < "$tmp/orphans"
 echo
 echo "$count orphan(s). Rows with PORTS are servers still listening - check before killing."

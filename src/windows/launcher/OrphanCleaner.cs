@@ -11,7 +11,7 @@ using System.Windows.Forms;
 static class OrphanCleanerLauncher
 {
     const string Title = "Orphan Process Cleaner";
-    static readonly string[] Scripts = { "Find-OrphanProcesses.ps1", "OrphanCleaner-GUI.ps1" };
+    static readonly string[] Scripts = { "Find-OrphanProcesses.ps1", "OrphanCleaner-GUI.ps1", "OrphanCleaner.ico" };
 
     [STAThread]
     static void Main()

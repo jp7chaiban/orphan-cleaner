@@ -17,6 +17,7 @@
 [CmdletBinding()]
 param(
     [string]$ExeDir = [Environment]::GetFolderPath('Desktop'),
+    [string]$ExeName = 'Orphan Cleaner.exe',
     [switch]$Skill,
     [switch]$SkillOnly,
     [string]$SkillDir = (Join-Path $HOME '.claude\skills')
@@ -29,23 +30,18 @@ $engine   = Join-Path $skillSrc 'scripts\Find-OrphanProcesses.ps1'
 $gui      = Join-Path $repo 'src\windows\OrphanCleaner-GUI.ps1'
 
 if (-not $SkillOnly) {
-    $exe = Join-Path $ExeDir 'Orphan Cleaner.exe'
+    $exe = Join-Path $ExeDir $ExeName
     $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
     if (-not (Test-Path $csc)) { throw "C# compiler not found at $csc (.NET Framework 4.x is required)." }
 
-    # Use Task Manager's icon for the exe.
-    Add-Type -AssemblyName System.Drawing
-    $ico = Join-Path ([IO.Path]::GetTempPath()) 'OrphanCleaner-build.ico'
-    $fs = [IO.File]::Create($ico)
-    try { [Drawing.Icon]::ExtractAssociatedIcon("$env:WINDIR\System32\Taskmgr.exe").Save($fs) } finally { $fs.Close() }
-
-    try {
-        & $csc /nologo /target:winexe /optimize "/win32icon:$ico" "/out:$exe" /r:System.Windows.Forms.dll `
-            "/resource:$engine,Find-OrphanProcesses.ps1" `
-            "/resource:$gui,OrphanCleaner-GUI.ps1" `
-            (Join-Path $repo 'src\windows\launcher\OrphanCleaner.cs')
-        if ($LASTEXITCODE) { throw "Compiling the exe failed (csc exit code $LASTEXITCODE)." }
-    } finally { Remove-Item $ico -ErrorAction SilentlyContinue }
+    $ico = Join-Path $repo 'assets\icon.ico'   # made by scripts\build-icon.ps1
+    New-Item -ItemType Directory -Force $ExeDir | Out-Null
+    & $csc /nologo /target:winexe /optimize "/win32icon:$ico" "/out:$exe" /r:System.Windows.Forms.dll `
+        "/resource:$engine,Find-OrphanProcesses.ps1" `
+        "/resource:$gui,OrphanCleaner-GUI.ps1" `
+        "/resource:$ico,OrphanCleaner.ico" `
+        (Join-Path $repo 'src\windows\launcher\OrphanCleaner.cs')
+    if ($LASTEXITCODE) { throw "Compiling the exe failed (csc exit code $LASTEXITCODE)." }
     Write-Host "Built $exe (self-contained, scripts embedded)."
 }
 
