@@ -46,16 +46,17 @@ cd orphan-cleaner
 powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
 ```
 
-The installer:
+The installer uses the C# compiler built into Windows to build **`Orphan Cleaner.exe`** on your
+Desktop. The exe is **self-contained**: both PowerShell scripts are embedded in it, so you can copy it
+to another folder or another PC and it still works. Each time it starts, it unpacks its scripts to
+`%LOCALAPPDATA%\OrphanCleaner` (only rewriting files that changed), so the command-line engine is
+available there too after the first run.
 
-- copies the scripts to `%LOCALAPPDATA%\OrphanCleaner`, and
-- compiles a small launcher, **`Orphan Cleaner.exe`**, onto your Desktop using the C# compiler built into Windows.
+To update, pull the repo and run the installer again.
 
-To install a newer version, run the installer again.
-
-> Windows Defender sometimes flags a freshly compiled, unsigned exe. If it quarantines the launcher,
-> re-run the installer, or start the window directly with
-> `powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\OrphanCleaner\OrphanCleaner-GUI.ps1"`.
+> Windows Defender sometimes flags a freshly compiled, unsigned exe. If it quarantines the exe,
+> re-run the installer, or run the window straight from the repo with
+> `powershell -ExecutionPolicy Bypass -File .\src\OrphanCleaner-GUI.ps1`.
 
 ## Use it: the window
 
@@ -139,6 +140,6 @@ here; close that session from its own terminal or app instead.
 ```
 src/Find-OrphanProcesses.ps1     engine: detection, reporting, killing (CLI)
 src/OrphanCleaner-GUI.ps1        the window (WinForms)
-src/launcher/OrphanCleaner.cs    tiny exe that opens the window without a console
-scripts/install.ps1              installs to %LOCALAPPDATA% and builds the Desktop exe
+src/launcher/OrphanCleaner.cs    exe that carries both scripts and opens the window without a console
+scripts/install.ps1              builds the self-contained exe onto the Desktop
 ```
