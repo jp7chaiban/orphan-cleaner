@@ -6,7 +6,9 @@
 Add-Type -AssemblyName System.Windows.Forms, System.Drawing
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
+# Next to this file when unpacked by the exe; in the skill folder when run from the repo.
 $engine = Join-Path $PSScriptRoot 'Find-OrphanProcesses.ps1'
+if (-not (Test-Path $engine)) { $engine = Join-Path $PSScriptRoot '..\..\skills\orphan-cleaner\scripts\Find-OrphanProcesses.ps1' }
 $script:items = @()
 
 # ---------- window ----------

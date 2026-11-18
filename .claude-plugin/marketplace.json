@@ -1,0 +1,11 @@
+{
+  "name": "orphan-cleaner",
+  "owner": { "name": "jp7chaiban" },
+  "plugins": [
+    {
+      "name": "orphan-cleaner",
+      "source": "./",
+      "description": "Find and kill orphaned processes left behind by coding agents on Windows, macOS and Linux."
+    }
+  ]
+}
