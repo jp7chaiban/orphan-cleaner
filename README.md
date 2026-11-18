@@ -41,7 +41,7 @@ Requirements: Windows 10/11 with Windows PowerShell 5.1 and .NET Framework 4.x (
 Windows). There is nothing to download.
 
 ```powershell
-git clone https://github.com/<you>/orphan-cleaner.git
+git clone https://github.com/jp7chaiban/orphan-cleaner.git
 cd orphan-cleaner
 powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1
 ```
